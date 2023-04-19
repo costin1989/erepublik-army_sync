@@ -1,32 +1,8 @@
--- phpMyAdmin SQL Dump
--- version 4.8.5
--- https://www.phpmyadmin.net/
---
--- Gazdă: 127.0.0.1
--- Timp de generare: apr. 18, 2023 la 02:39 PM
--- Versiune server: 10.1.38-MariaDB
--- Versiune PHP: 7.3.4
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Bază de date: `erep`
---
-
--- --------------------------------------------------------
-
 --
 -- Structură tabel pentru tabel `accounts`
 --
+
+DROP TABLE accounts;
 
 CREATE TABLE `accounts` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -41,55 +17,8 @@ CREATE TABLE `accounts` (
 -- Eliminarea datelor din tabel `accounts`
 --
 
-INSERT INTO `accounts` (`id`, `api_key`, `username`, `expires_on`, `max_orders`, `status`) VALUES
-(2, 'be14d5ef19279bc84f3999def8456e0c', 'admin', '2024-04-23 18:25:43', 2, 'active'),
-(8, '92e2616b747afbc057221a2dee3fa32e', 'costin2', '2024-04-23 18:25:43', 2, 'suspended');
-
+INSERT INTO `accounts` (`id`, `api_key`, `username`, `expires_on`, `max_orders`, `status`) VALUES (NULL, '92e2616b747afbc057221a2dee3fa32e', 'admin', '2024-04-20 00:59:12', '100', 'active');
 -- --------------------------------------------------------
-
---
--- Structură tabel pentru tabel `accounts_roles`
---
-
-CREATE TABLE `accounts_roles` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `account_id` bigint(20) UNSIGNED NOT NULL,
-  `role_id` bigint(20) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Eliminarea datelor din tabel `accounts_roles`
---
-
-INSERT INTO `accounts_roles` (`id`, `account_id`, `role_id`) VALUES
-(1, 2, 1);
-
--- --------------------------------------------------------
-
---
--- Structură tabel pentru tabel `orders`
---
-
-CREATE TABLE `orders` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `battle_id` int(11) NOT NULL,
-  `fight_for` varchar(255) NOT NULL,
-  `wall` int(11) NOT NULL,
-  `candies` tinyint(1) NOT NULL,
-  `added_by` bigint(20) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Eliminarea datelor din tabel `orders`
---
-
-INSERT INTO `orders` (`id`, `battle_id`, `fight_for`, `wall`, `candies`, `added_by`) VALUES
-(16, 544168, 'RO', 55, 1, 8),
-(20, 4444, '<script>alert(\'aaa\')</script>', 20, 0, 2),
-(21, 544168, 'RO', 55, 1, 2);
-
--- --------------------------------------------------------
-
 --
 -- Structură tabel pentru tabel `roles`
 --
@@ -106,6 +35,38 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id`, `name`, `description`) VALUES
 (1, 'admin', 'users with this role are able to manage accounts');
+
+--
+-- Structură tabel pentru tabel `accounts_roles`
+--
+
+CREATE TABLE `accounts_roles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `account_id` bigint(20) UNSIGNED NOT NULL,
+  `role_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `accounts_roles` (`id`, `account_id`, `role_id`) VALUES
+(1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Structură tabel pentru tabel `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `battle_id` int(11) NOT NULL,
+  `fight_for` varchar(255) NOT NULL,
+  `wall` int(11) NOT NULL,
+  `candies` tinyint(1) NOT NULL,
+  `added_by` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+-- --------------------------------------------------------
 
 --
 -- Indexuri pentru tabele eliminate
@@ -187,8 +148,4 @@ ALTER TABLE `accounts_roles`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`added_by`) REFERENCES `accounts` (`id`);
-COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

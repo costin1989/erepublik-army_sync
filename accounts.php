@@ -63,12 +63,10 @@ function readAccount($id) {
     $result = mysqli_query($conn, $sql);
 
     // Check for errors
-    if (!$result) {
-        return array('error' => 'Error retrieving accounts: ' . mysqli_error($conn));
-    }
-
-    if (mysqli_num_rows($result) != 1) {
-        return array('error' => 'Error retrieving account with id: '. $id);
+    if (mysqli_num_rows($result) > 1) {
+        return array('error' => 'Error retrieving account: Multiple accounts with same id');
+    } else if (mysqli_num_rows($result) < 1) {
+        return array('error' => 'Account not found.');
     }
 
     // Build the response array
@@ -105,6 +103,11 @@ function readAccountByKey($api_key){
 function updateAccount($id, $data) {
     global $conn;
 
+    $response = readAccount($id);
+    if(array_key_exists('error', $response)){
+       return array('error' => 'Error updating account: '.$response['error']);
+    }
+
     // Extract the data from the request body
     $api_key = mysqli_real_escape_string($conn, $data['api_key']);
     $username = mysqli_real_escape_string($conn, $data['username']);
@@ -124,9 +127,45 @@ function updateAccount($id, $data) {
     }
 }
 
+
+//Update status of an existing account
+function updateAccountStatus($id, $data) {
+    global $conn;
+
+    $response = readAccount($id);
+    if(array_key_exists('error', $response)){
+       return array('error' => 'Error updating account: '.$response['error']);
+    }
+
+    if (isset($data['status'])) {
+        $status = mysqli_real_escape_string($conn, $data['status']);
+
+        // Prepare the SQL query
+        $sql = "UPDATE accounts SET status='$status' WHERE id=$id";
+
+        // Execute the query
+        if (mysqli_query($conn, $sql)) {
+            return array('message' => 'Account updated successfully');
+        } else {
+            return array('error' => 'Error updating account: ' . mysqli_error($conn));
+        }
+    } else {
+        return array('error' => 'Error updating account: Status field is missing');
+    }
+}
+
 // Delete an existing account
 function deleteAccount($id) {
     global $conn;
+
+    $response = readAccount($id);
+    if(array_key_exists('error', $response)){
+       return array('error' => 'Error deleting account: '.$response['error']);
+    }
+
+    if($response['role_name'] == 'admin'){
+
+    }
 
     // Prepare the SQL query
     $sql = "DELETE FROM accounts WHERE id=$id";
@@ -139,14 +178,30 @@ function deleteAccount($id) {
     }
 }
 
+//API key validation: return the account based on the provided api key
+function validateApiKey(){
+    if(isset($_GET['api_key'])){
+        $apiKey = $_GET['api_key'];
+    } else {
+        header('HTTP/1.1 401 Unauthorized');
+        echo json_encode(array('error' => 'You need to use an api_key param in order to execute requests.'));
+        exit();
+    }
+
+    $account = readAccountByKey($apiKey);
+    if(array_key_exists('error', $account)){
+        header('HTTP/1.1 401 Unauthorized');
+        exit();
+    }
+    return $account;
+}
+
 // Handle HTTP requests
 $method = $_SERVER['REQUEST_METHOD'];
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode( '/', $uri );
 if(in_array('accounts.php', $uri)){
-    //API key validation
-    $apiKey = isset($_GET['api_key']) ? $_GET['api_key'] : '';
-    $account = readAccountByKey($apiKey);
+    $account = validateApiKey();
     switch ($method) {
         case 'GET':
             $id = $_GET['id'] ?? null;
@@ -156,26 +211,37 @@ if(in_array('accounts.php', $uri)){
                     $response = readAccount($id);
                     echo json_encode($response);
                     break;
-                }
+                } 
             } else if($account['role_name'] == 'admin') {
                 $response = readAccounts();
+                echo json_encode($response);
+                break;
+            } 
+            header('HTTP/1.1 403 Forbidden');
+            exit();
+        case 'POST':
+                $data = json_decode(file_get_contents('php://input'), true);
+                $response = createAccount($data);
+                echo json_encode($response);
+            break;
+        case 'PUT':
+            if($account['role_name'] == 'admin'){      
+                $data = json_decode(file_get_contents('php://input'), true);
+                $id = $_GET['id'];
+                $id = mysqli_real_escape_string($conn, $id);
+                $response = updateAccount($id, $data);
                 echo json_encode($response);
                 break;
             } else {
                 header('HTTP/1.1 403 Forbidden');
                 exit();
             }
-        case 'POST':
-            $data = json_decode(file_get_contents('php://input'), true);
-            $response = createAccount($data);
-            echo json_encode($response);
-            break;
-        case 'PUT':
-            if($account['role_name'] == 'admin'){
-                $data = json_decode(file_get_contents('php://input'), true);
+        case 'PATCH':
+            if($account['role_name'] == 'admin'){    
                 $id = $_GET['id'];
                 $id = mysqli_real_escape_string($conn, $id);
-                $response = updateAccount($id, $data);
+                $data = json_decode(file_get_contents('php://input'), true);
+                $response = updateAccountStatus($id, $data);
                 echo json_encode($response);
                 break;
             } else {

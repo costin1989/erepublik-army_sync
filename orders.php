@@ -135,20 +135,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode( '/', $uri );
 if(in_array('orders.php', $uri)){
-    //API key validation
-    if(isset($_GET['api_key'])){
-        $apiKey = $_GET['api_key'];
-    } else {
-        header('HTTP/1.1 401 Unauthorized');
-        echo json_encode(array('error' => 'You need to use an api_key param in order to execute requests.'));
-        exit();
-    }
-
-    $account = readAccountByKey($apiKey);
-    if(array_key_exists('error', $account)){
-        header('HTTP/1.1 401 Unauthorized');
-        exit();
-    }
+    $account = validateApiKey();
     switch ($method) {
         case 'GET':
             $id = $_GET['id'] ?? null;
