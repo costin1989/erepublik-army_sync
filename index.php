@@ -1,5 +1,5 @@
 <?php
 header("Content-Type: application/json");
-$response = array("message" => "Hello, World!");
+$response = array("message" => "Welcome to erep online tool! Enjoy!");
 echo json_encode($response);
 ?>

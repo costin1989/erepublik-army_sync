@@ -179,6 +179,9 @@ if(in_array('orders.php', $uri)){
             $id = mysqli_real_escape_string($conn, $id);
             $response = deleteOrder($id, $account['id']);
             echo json_encode($response);
+            break;
+        default:
+            header('HTTP/1.1 405 Method Not Allowed');
         }
     }
 ?>

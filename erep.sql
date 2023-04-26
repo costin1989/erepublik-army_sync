@@ -66,6 +66,40 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+--
+-- Structură tabel pentru tabel `soldiers`
+--
+
+CREATE TABLE `soldiers` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `link` varchar(255) NOT NULL,
+  `ff` int(11) NOT NULL,
+  `candies` int(11) NOT NULL,
+  `boosters_100` int(11) NOT NULL,
+  `boosters_50` int(11) NOT NULL,
+  `energy_bar` int(11) NOT NULL,
+  `ground_rank` int(11) NOT NULL,
+  `air_rank` int(11) NOT NULL,
+  `strength` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+--
+-- Indexuri pentru tabele `soldiers`
+--
+ALTER TABLE `soldiers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`);
+
+--
+-- AUTO_INCREMENT pentru tabele `soldiers`
+--
+ALTER TABLE `soldiers`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+COMMIT;
+
 -- --------------------------------------------------------
 
 --

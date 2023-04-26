@@ -258,7 +258,9 @@ if(in_array('accounts.php', $uri)){
                 header('HTTP/1.1 403 Forbidden');
                 exit();
             }
-            
+            break;
+        default:
+            header('HTTP/1.1 405 Method Not Allowed');
         }
     }
 ?>
