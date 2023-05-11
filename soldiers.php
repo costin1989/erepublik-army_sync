@@ -1,8 +1,6 @@
 <?php
 include('db.php');
-
-// Set the content type to JSON
-header('Content-Type: application/json');
+include('cors.php');
 
 // Register a new player
 function createSoldier($data) {
